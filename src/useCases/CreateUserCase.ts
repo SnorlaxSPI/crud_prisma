@@ -1,30 +1,35 @@
-import { prisma } from '../prisma/client';
-import { CreateUserDTO } from "../dtos/CreateUserDTO";
-import { User } from '@prisma/client';
-import { AppError } from '../errors/AppError';
+import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from 'express';
+
+const prisma = new PrismaClient();
+
+//const CreateUserCase = async(
+//  request: Request, response: Response, next: NextFunction) => {
+//
+//    const { email } = request.body;
+//
+//    let user = await prisma.user.findFirst({ where: { email }});
+//
+//    if (user) {
+//      return response.status(400).json({ error: 'email already exists!'});
+//    }
+//
+//    return next();
+//  };
+//
+//  export { CreateUserCase };
 
 class CreateUserCase {
-  async execute ({ name, email }: CreateUserDTO): Promise<User> {
+  async findByName(request: Request, response:Response, next:NextFunction) {
+    const { email } = request.body;
 
-    const userAlreadyExists = await prisma.user.findUnique({
-      where: {
-        email
-      }
-    });
+    let user = await prisma.user.findFirst({ where: { email }});
 
-    if (userAlreadyExists) {
-      throw new AppError ('User already exists!')
+    if (user) {
+      return response.status(400).json({ error: 'Email already exists!'});
     }
 
-    // Criar usuário
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-      }
-    });
-
-    return user;
+    return next();
   }
 };
 
