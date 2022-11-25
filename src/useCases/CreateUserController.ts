@@ -10,10 +10,15 @@ class CreateUserController {
 
     const createUserCase = new CreateUseCase();
 
+    const userAlreadyExists = await prisma.user.findFirst({ where: { email }});
+
+    if (userAlreadyExists) {
+      return response.status(400).json({ error: "Já existe um e-mail" });
+    }
+
     const user = await createUserCase.execute({ name, email });
-
+   
     return response.status(201).json(user);
-
   }
 };
 
