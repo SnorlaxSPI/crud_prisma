@@ -1,11 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, response, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { CreateUseCase } from './CreateUserCase';
 
 const prisma = new PrismaClient();
 
 class CreateUserController {
-  async handle(request: Request, response:Response) {
+
+  async handle(request: Request, response: Response) {
     const { name, email } = request.body;
 
     const createUserCase = new CreateUseCase();
@@ -13,7 +14,7 @@ class CreateUserController {
     const userAlreadyExists = await prisma.user.findFirst({ where: { email }});
 
     if (userAlreadyExists) {
-      return response.status(400).json({ error: "Já existe um e-mail" });
+      return response.status(400).json({ error: "E-mail Already exists!" });
     }
 
     const user = await createUserCase.execute({ name, email });
